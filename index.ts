@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import chalk from 'chalk';
 import { userRouter } from './users/index.js';
 
@@ -8,7 +8,7 @@ const app = express();
 app.use((req, res, next) => {
     console.log(`Time: ${Date.now()}`);
     next();
-})
+});
 
 // app.get('/hello', (req, res, next) => {
 //     res.send({ success: true });
@@ -16,15 +16,15 @@ app.use((req, res, next) => {
 // });
 
 app.get('/hello', (req, res, next) => {
-    throw new Error('Error!!!')
+    throw new Error('Error!!!');
 });
 
 app.use('/users', userRouter);
 
-app.use((error, req, res, next) => {
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
     console.log(error.message);
-    res.status(501).send(error.message)
-})
+    res.status(500).send(error.message);
+});
 // app.use((err, req, res, next) => {
 //     console.error(err.stack)
 //     res.status(500).send('Something broke!')
