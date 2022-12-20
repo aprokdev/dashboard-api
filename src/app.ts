@@ -1,32 +1,30 @@
 // const chalk = require('chalk');
 import express, { Express } from 'express';
+import 'reflect-metadata';
 import { Server } from 'http';
-import { LoggerService } from './logger/logger.service';
-import { UserController } from './users/users.controller';
+import { UsersController } from './users/users.controller';
 import { ExeptionFilter } from './errors/exeption.filter';
+import { ILogger } from './logger/logger.interface';
+import { inject, injectable } from 'inversify';
+import { TYPES } from './types';
 
+@injectable()
 export class App {
     app: Express;
     server: Server;
     port: number;
-    logger: LoggerService;
-    userController: UserController;
-    exeptionFilter: ExeptionFilter;
 
     constructor(
-        logger: LoggerService,
-        userController: UserController,
-        exeptionFilter: ExeptionFilter
+        @inject(TYPES.ILogger) private logger: ILogger,
+        @inject(TYPES.IUsersController) private usersController: UsersController,
+        @inject(TYPES.ExeptionFilter) private exeptionFilter: ExeptionFilter
     ) {
         this.app = express();
         this.port = 8000;
-        this.logger = logger;
-        this.userController = userController;
-        this.exeptionFilter = exeptionFilter;
     }
 
     useRoutes() {
-        this.app.use('/users', this.userController.router);
+        this.app.use('/users', this.usersController.router);
     }
 
     useExeptionFilters() {
@@ -37,7 +35,6 @@ export class App {
         this.useRoutes();
         this.useExeptionFilters();
         this.server = this.app.listen(this.port);
-        // console.log(chalk.bgGreen(`Server has been started on https://localhost:${this.port}`));
         this.logger.log(`Server has been started on https://localhost:${this.port}`);
     }
 }
