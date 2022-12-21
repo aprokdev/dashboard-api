@@ -8,15 +8,15 @@ import { TYPES } from '../types';
 
 @injectable()
 export class ExeptionFilter implements IExeptionFilter {
-    constructor(@inject(TYPES.ILogger) private logger: ILogger) {}
+	constructor(@inject(TYPES.ILogger) private logger: ILogger) {}
 
-    catch(error: Error | HTTPError, req: Request, res: Response, next: NextFunction) {
-        if (error instanceof HTTPError) {
-            this.logger.error(`[${error.context}] Error ${error.statusCode} ${error.message}`);
-            res.status(error.statusCode).send({ error: error.message });
-        } else {
-            this.logger.error(`Error ${error.message}`);
-            res.status(500).send({ error: error.message });
-        }
-    }
+	catch(error: Error | HTTPError, req: Request, res: Response, next: NextFunction): void {
+		if (error instanceof HTTPError) {
+			this.logger.error(`[${error.context}] Error ${error.statusCode} ${error.message}`);
+			res.status(error.statusCode).send({ error: error.message });
+		} else {
+			this.logger.error(`Error ${error.message}`);
+			res.status(500).send({ error: error.message });
+		}
+	}
 }

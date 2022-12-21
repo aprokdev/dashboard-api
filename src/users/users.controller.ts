@@ -9,20 +9,21 @@ import { IUsersController } from './users.controller.interface';
 
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
-    constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
-        super(loggerService)
-        this.bindRoutes([
-            { path: '/login', func: this.login, method: 'post' },
-            { path: '/register', func: this.register, method: 'post' },
-        ]);
-    }
+	constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
+		super(loggerService);
+		this.bindRoutes([
+			{ path: '/login', func: this.login, method: 'post' },
+			{ path: '/register', func: this.register, method: 'post' },
+		]);
+	}
 
-    login(req: Request, res: Response, next: NextFunction) {
-        // res.send('Login');
-        next(new HTTPError(401, 'Not authorized', 'login'));
-    }
+	login(req: Request, res: Response, next: NextFunction): void {
+		// res.send('Login');
+		console.log('werwe');
+		next(new HTTPError(401, 'Not authorized', 'login'));
+	}
 
-    register(req: Request, res: Response, next: NextFunction) {
-        res.send('Register');
-    }
+	register(req: Request, res: Response, next: NextFunction): void {
+		res.send('Register');
+	}
 }
