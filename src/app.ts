@@ -1,12 +1,12 @@
 import express, { Express } from 'express';
 import 'reflect-metadata';
 import { Server } from 'http';
-import { UsersController } from './users/users.controller';
-import { ExeptionFilter } from './errors/exeption.filter';
 import { ILogger } from './logger/logger.interface';
 import { inject, injectable } from 'inversify';
 import { TYPES } from './types';
-import { json } from 'body-parser';
+import { IUsersController } from './users/users.controller.interface';
+import { IConfigService } from './config/config.service.interface';
+import { IExeptionFilter } from './errors/exeption.filter.interface';
 
 @injectable()
 export class App {
@@ -16,15 +16,21 @@ export class App {
 
 	constructor(
 		@inject(TYPES.ILogger) private logger: ILogger,
-		@inject(TYPES.IUsersController) private usersController: UsersController,
-		@inject(TYPES.ExeptionFilter) private exeptionFilter: ExeptionFilter,
+		@inject(TYPES.IUsersController) private usersController: IUsersController,
+		@inject(TYPES.ExeptionFilter) private exeptionFilter: IExeptionFilter,
+		@inject(TYPES.IConfigService) private configService: IConfigService,
 	) {
 		this.app = express();
 		this.port = 8000;
 	}
 
 	useMiddleware(): void {
-		this.app.use(json());
+		this.app.use(express.json());
+		// eslint-disable-next-line
+		this.app.use((res, req, next) => {
+			// this.logger.log(req);
+			next();
+		});
 	}
 
 	useRoutes(): void {

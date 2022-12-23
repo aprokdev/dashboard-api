@@ -9,6 +9,8 @@ import { UsersController } from './users/users.controller';
 import { IUsersController } from './users/users.controller.interface';
 import { UserService } from './users/users.service';
 import { IUsersService } from './users/users.service.interface';
+import { ConfigService } from './config/config.service';
+import { IConfigService } from './config/config.service.interface';
 
 export interface IBootstrapReturn {
 	appContainer: Container;
@@ -16,11 +18,12 @@ export interface IBootstrapReturn {
 }
 
 export const appBindings = new ContainerModule((bind: interfaces.Bind) => {
-	bind<ILogger>(TYPES.ILogger).to(LoggerService);
-	bind<IExeptionFilter>(TYPES.ExeptionFilter).to(ExeptionFilter);
-	bind<IUsersController>(TYPES.IUsersController).to(UsersController);
-	bind<IUsersService>(TYPES.IUserService).to(UserService);
-	bind<App>(TYPES.Application).to(App);
+	bind<ILogger>(TYPES.ILogger).to(LoggerService).inSingletonScope();
+	bind<IExeptionFilter>(TYPES.ExeptionFilter).to(ExeptionFilter).inSingletonScope();
+	bind<IUsersController>(TYPES.IUsersController).to(UsersController).inSingletonScope();
+	bind<IUsersService>(TYPES.IUserService).to(UserService).inSingletonScope();
+	bind<IConfigService>(TYPES.IConfigService).to(ConfigService).inSingletonScope();
+	bind<App>(TYPES.Application).to(App).inSingletonScope();
 });
 
 function bootstrap(): IBootstrapReturn {
