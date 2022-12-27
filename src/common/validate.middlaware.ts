@@ -1,6 +1,6 @@
 import { ClassConstructor, plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { IMiddleware } from './middleware.interface';
 
 export class ValidateMiddleware implements IMiddleware {

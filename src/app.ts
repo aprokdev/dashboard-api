@@ -1,12 +1,14 @@
+import { json } from 'body-parser';
 import express, { Express } from 'express';
-import 'reflect-metadata';
 import { Server } from 'http';
-import { ILogger } from './logger/logger.interface';
 import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
+import { IConfigService } from './config/config.service.interface';
+import { PrismaService } from './database/prisma.service';
+import { IExeptionFilter } from './errors/exeption.filter.interface';
+import { ILogger } from './logger/logger.interface';
 import { TYPES } from './types';
 import { IUsersController } from './users/users.controller.interface';
-import { IConfigService } from './config/config.service.interface';
-import { IExeptionFilter } from './errors/exeption.filter.interface';
 
 @injectable()
 export class App {
@@ -19,18 +21,14 @@ export class App {
 		@inject(TYPES.IUsersController) private usersController: IUsersController,
 		@inject(TYPES.ExeptionFilter) private exeptionFilter: IExeptionFilter,
 		@inject(TYPES.IConfigService) private configService: IConfigService,
+		@inject(TYPES.PrismaService) private prismaService: PrismaService,
 	) {
 		this.app = express();
 		this.port = 8000;
 	}
 
 	useMiddleware(): void {
-		this.app.use(express.json());
-		// eslint-disable-next-line
-		this.app.use((res, req, next) => {
-			// this.logger.log(req);
-			next();
-		});
+		this.app.use(json());
 	}
 
 	useRoutes(): void {
@@ -45,6 +43,7 @@ export class App {
 		this.useMiddleware();
 		this.useRoutes();
 		this.useExeptionFilters();
+		await this.prismaService.connect();
 		this.server = this.app.listen(this.port);
 		this.logger.log(`Server has been started on https://localhost:${this.port}`);
 	}
