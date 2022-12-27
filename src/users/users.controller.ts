@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
+import { sign } from 'jsonwebtoken';
+import { AuthGuard } from '../common/auth-guard.middleware';
 import { BaseController } from '../common/base.controller';
 import { ValidateMiddleware } from '../common/validate.middlaware';
+import { IConfigService } from '../config/config.service.interface';
 import { HTTPError } from '../errors/http-error.class';
 import { ILogger } from '../logger/logger.interface';
 import { TYPES } from '../types';
@@ -15,6 +18,7 @@ export class UsersController extends BaseController implements IUsersController 
 	constructor(
 		@inject(TYPES.ILogger) private loggerService: ILogger,
 		@inject(TYPES.IUsersService) private usersService: IUsersService,
+		@inject(TYPES.IConfigService) private configService: IConfigService,
 	) {
 		super(loggerService);
 		this.bindRoutes([
@@ -30,19 +34,27 @@ export class UsersController extends BaseController implements IUsersController 
 				method: 'post',
 				middlewares: [new ValidateMiddleware(UserRegisterDto)],
 			},
+			{
+				path: '/info',
+				func: this.info,
+				method: 'get',
+				middlewares: [new AuthGuard()],
+			},
 		]);
 	}
 
 	async login(
-		{ body }: Request<{}, {}, UserLoginDto>,
+		req: Request<{}, {}, UserLoginDto>,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
-		const isValid = await this.usersService.validateUser(body);
+		const isValid = await this.usersService.validateUser(req.body);
 		if (!isValid) {
 			return next(new HTTPError(401, 'Authorization error', 'login'));
 		}
-		this.ok(res, { sucess: true });
+		const secret = this.configService.get('SECRET');
+		const jwt = await this.signJWT(req.body.email, secret);
+		this.ok(res, { sucess: true, jwt });
 	}
 
 	async register(
@@ -55,5 +67,31 @@ export class UsersController extends BaseController implements IUsersController 
 			return next(new HTTPError(422, 'User already exists'));
 		}
 		this.ok(res, { email: result.email, id: result.id });
+	}
+
+	async info({ user }: Request, res: Response, next: NextFunction): Promise<void> {
+		const userInfo = await this.usersService.getUserInfo(user);
+		this.ok(res, { userInfo });
+	}
+
+	private signJWT(email: string, secret: string): Promise<string> {
+		return new Promise<string>((res, rej) => {
+			sign(
+				{
+					email,
+					iat: Math.floor(Date.now() / 1000),
+				},
+				secret,
+				{
+					algorithm: 'HS256',
+				},
+				(err, token) => {
+					if (err) {
+						rej(err);
+					}
+					res(token as string);
+				},
+			);
+		});
 	}
 }
