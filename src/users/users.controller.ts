@@ -16,7 +16,7 @@ import { IUsersService } from './users.service.interface';
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
 	constructor(
-		@inject(TYPES.ILogger) private loggerService: ILogger, // for BaseController
+		@inject(TYPES.ILogger) private loggerService: ILogger,
 		@inject(TYPES.IUsersService) private usersService: IUsersService,
 		@inject(TYPES.IConfigService) private configService: IConfigService,
 	) {

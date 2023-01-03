@@ -7,4 +7,5 @@ export const TYPES = {
 	ExeptionFilter: Symbol.for('ExeptionFilter'),
 	PrismaService: Symbol.for('PrismaService'),
 	IUsersRepository: Symbol.for('IUsersRepository'),
+	IAuthMiddleware: Symbol.for('IAuthMiddleware'),
 };

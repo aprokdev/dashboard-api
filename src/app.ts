@@ -2,8 +2,7 @@ import { json } from 'body-parser';
 import express, { Express } from 'express';
 import { Server } from 'http';
 import { inject, injectable } from 'inversify';
-import 'reflect-metadata';
-import { AuthMiddleware } from './common/auth.middleware';
+import { IMiddleware } from './common/middleware.interface';
 import { IConfigService } from './config/config.service.interface';
 import { PrismaService } from './database/prisma.service';
 import { IExeptionFilter } from './errors/exeption.filter.interface';
@@ -23,6 +22,7 @@ export class App {
 		@inject(TYPES.ExeptionFilter) private exeptionFilter: IExeptionFilter,
 		@inject(TYPES.IConfigService) private configService: IConfigService,
 		@inject(TYPES.PrismaService) private prismaService: PrismaService,
+		@inject(TYPES.IAuthMiddleware) private authMiddleware: IMiddleware,
 	) {
 		this.app = express();
 		this.port = 8000;
@@ -30,8 +30,7 @@ export class App {
 
 	useMiddleware(): void {
 		this.app.use(json());
-		const authMiddleware = new AuthMiddleware(this.configService.get('SECRET'));
-		this.app.use(authMiddleware.execute.bind(authMiddleware));
+		this.app.use(this.authMiddleware.execute.bind(this.authMiddleware));
 	}
 
 	useRoutes(): void {
@@ -51,9 +50,6 @@ export class App {
 		this.logger.log(`Server has been started on https://localhost:${this.port}`);
 	}
 
-	/**
-	 * close
-	 */
 	public close(): void {
 		this.server.close();
 	}

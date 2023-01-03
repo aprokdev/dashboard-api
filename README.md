@@ -1,17 +1,16 @@
 
 ## dashboard-api ✨
----
 
-This is a trainy project related to **++[this](https://www.udemy.com/course/nodejs-start/learn/lecture/28136972#overview)++** tutorial course.
+This is a trainy project related to [this](https://www.udemy.com/course/nodejs-start/learn/lecture/28136972#overview) tutorial course.
 
 It is a simple example how to build an API based on Express.js and Typescript. 
 
 
-Dependancy injection are implemented via **++[inversify](https://www.npmjs.com/package/inversify)++**. 
+Dependancy injection are implemented via [inversify](https://www.npmjs.com/package/inversify). 
 
-Uses **++[prisma](https://www.prisma.io/)++** as database. 
+Uses [prisma](https://www.prisma.io/) as database. 
 
-Uses **++[jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)++** to sign login attempts and create JWTs.
+Uses [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken) to sign login attempts and create JWTs.
 
 To run it, just inslatt all depandancies by running
 
